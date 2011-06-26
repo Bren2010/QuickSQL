@@ -13,6 +13,9 @@ var (
 )
 
 type SqlOutgoing struct {
+	Error string
+	AffectedRows uint64
+	LastInsertID uint64
 	Count int
 	Results []mysql.Map
 }
@@ -41,7 +44,7 @@ func sqlThread() {
 		query := queryStruct.Sql
 		
 		err = db.Query(query)
-		handleErr(err, true)
+		handleErr(err, false)
 		
 		// Get result set
 		result, err := db.UseResult()
@@ -60,7 +63,13 @@ func sqlThread() {
 			rowArray = append(rowArray, row)
 		}
 		
-		response := SqlOutgoing{len(rowArray), rowArray}
+		errString := ""
+		
+		if err != nil {
+			errString = err.String()
+		}
+
+		response := SqlOutgoing{errString, db.AffectedRows, db.LastInsertId, len(rowArray), rowArray}
 		
 		queryStruct.ResponseChan <- response
 		

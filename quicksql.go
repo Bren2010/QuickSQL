@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"os"
 	"net"
-	"os/signal"
-	"strings"
-	"encoding/hex"
 	"bufio"
 	"json"
 	"github.com/Philio/GoMySQL"
@@ -24,12 +21,17 @@ var (
 	dbPass = "pass"
 	dbName = "example_db"
 	
+	// Cache Settings
+	cacheAge int64 = 30 // How long cache entries should live
+	cachePeriod = 1 // How often to clean the cache
 	
 	// System Variables
 	data = make([]byte, 4096)
 	listener *net.UnixListener
 	db *mysql.Client
 	addr *net.UnixAddr
+	packetDelim = byte(4)
+	unitSep = byte(31)
 )
 // End
 
@@ -53,7 +55,6 @@ func main() {
 		handleErr(err, true)
 	}
 	
-	go signalHandler()
 	go sqlThread()
 	go cacheCleaner()
 	
@@ -63,49 +64,38 @@ func main() {
 		
 		reader := bufio.NewReader(conn)
 		
-		dst := make([]byte, 4096)
-		
 		for {
-			line, _, err := reader.ReadLine()
+			queryBytes, err := reader.ReadSlice(unitSep)
 			
-			if string(line) != "" {
-				c, err := hex.Decode(dst, line)
-				handleErr(err, true)
-				
-				received := string(dst[0:c])
-				
-				hash := hash(received)
-				
-				if inArray(hash) == true {
-					conn.Write(hashTable[hash].Data)
-				} else {
-					structResponse := handleQuery(received)
-					
-					jsonResponse, err := json.Marshal(structResponse)
-					handleErr(err, true)
-					fmt.Println(string(jsonResponse))
-					response := hex.EncodeToString(jsonResponse)
-					
-					c, err = conn.Write([]byte(response+"\n\r"))
-					
-					addToCache(hash, response+"\n\r")
-				}
-			} else if err != nil {
+			if err != nil {
 				break
 			}
-		}
-	}
-}
+			
+			cacheByte, err := reader.ReadSlice(packetDelim)
+			
+			if err != nil {
+				break
+			}
+			
+			received := string(queryBytes[0:len(queryBytes) - 1])
+			shouldCache := string(cacheByte[0:len(cacheByte) - 1])
+			
+			hash := hash(received)
+			
+			if inArray(hash) == true && shouldCache != "1" {
+				conn.Write(hashTable[hash].Data)
+			} else {
+				structResponse := handleQuery(received)
+				
+				response, err := json.Marshal(structResponse)
+				handleErr(err, true)
 
-func signalHandler() {
-	for true {
-		sig := <- signal.Incoming
-		array := strings.Split(sig.String(), ": ", 2)
-		
-		if array[0] != "SIGCHLD" {
-			fmt.Println("Received "+array[0]+".")
-			close()
-			os.Exit(0)
+				response = append(response, packetDelim)
+				
+				_, err = conn.Write(response)
+				
+				addToCache(hash, response)
+			}
 		}
 	}
 }

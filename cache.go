@@ -15,6 +15,8 @@ type cacheEntry struct {
 }
 
 func cacheCleaner() {
+	realPeriod := int64(cachePeriod * 1000000000)
+	
 	dummy := cacheEntry{[]byte{}, 0}
 	
 	for {
@@ -24,12 +26,12 @@ func cacheCleaner() {
 			}
 		}
 		
-		time.Sleep(1000000000)
+		time.Sleep(realPeriod)
 	}
 }
 
-func addToCache(hash uint32, value string) {
-	hashTable[hash] = cacheEntry{[]byte(value), time.Seconds() + 30}
+func addToCache(hash uint32, value []byte) {
+	hashTable[hash] = cacheEntry{value, time.Seconds() + cacheAge}
 }
 
 func inArray(hash uint32) bool {
