@@ -14,6 +14,7 @@ var (
 	// Configuration Options
 	// Connection Info
 	file = "/tmp/dbsock"
+	workerThreads = 50
 	
 	// DB Connection Info
 	dbHost = "localhost"
@@ -32,6 +33,7 @@ var (
 	addr *net.UnixAddr
 	packetDelim = byte(4)
 	unitSep = byte(31)
+	connections = make(chan *net.UnixConn, 0)
 )
 // End
 
@@ -55,9 +57,25 @@ func main() {
 		handleErr(err, true)
 	}
 	
+	fmt.Println("Spawning worker threads...")
+	
+	i := 1
+	
+	for i < workerThreads {
+		go workerThread()
+		i = i + 1
+	}
+	
+	fmt.Println("Done.")
+	
 	go sqlThread()
 	go cacheCleaner()
 	
+	// Put main to work as a worker thread too.
+	workerThread()
+}
+
+func workerThread() {
 	for {
 		conn, err := listener.AcceptUnix()	
 		handleErr(err, true)
