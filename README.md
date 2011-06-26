@@ -4,10 +4,10 @@ QuickSQL
 Overview
 --------
 
-QuickSQL is a MySQL wrapper coded in [Go](http://golang.org/ "GoLang Website") that 
-uses [Philio's GoMySQL](https://github.com/Philio/GoMySQL "GitHub for GoMySQL") library.  
-QuickSQL also has an automatic caching mechanism that is equal to or less than the speed 
-of [Memcached](http://memcached.org/ "Memcached website") (I hope to have benchmarks soon).
+QuickSQL is a small MySQL wrapper coded in [Go](http://golang.org/ "GoLang Website") that 
+was designed to do all the work associated with using [Memcached](http://memcached.org/ "Memcached website") 
+at more than x3 the speed.  Graciously using Philio's wonderful 
+[GoMySQL](https://github.com/Philio/GoMySQL "GitHub for GoMySQL") library.
 
 
 Compiling
@@ -32,3 +32,6 @@ Changelog
 3. Errors, number of affected rows, and last insert id are now returned with the row count and query results.
 4. Cache lifespan and the frequency of cache updates is now configureable in quicksql.go.
 5. Clients have the option to bypass the cache.
+
+**Version 1.2**
+1. Multiple connections at once.
