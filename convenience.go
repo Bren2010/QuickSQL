@@ -18,11 +18,4 @@ func handleErr(err os.Error, critical bool) {
 		}
 	}
 }
-
-// A function to always make sure the connection is closed.
-func close() {
-	err := listener.Close()
-	handleErr(err, false)
-	fmt.Println("Listener Closed.")
-}
 // End functions
