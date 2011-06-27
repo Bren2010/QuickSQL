@@ -16,7 +16,7 @@ class QuickSQL {
 	public function fetch($sql, $bypassCache = 0) {
 		$data = $this->write($sql, $bypassCache);
 		
-		return $data['Results']; // Ignoring errors for now.
+		return $data['Results'];
 	}
 	
 	public function count($sql, $bypassCache = 0) {
