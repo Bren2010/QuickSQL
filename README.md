@@ -26,12 +26,16 @@ manually using 8g.)
 Changelog
 ---------
 
+
 **Version 1.1**
+
 1. Removed encoding in place of EOT.
 2. Removed the signal handler.
 3. Errors, number of affected rows, and last insert id are now returned with the row count and query results.
 4. Cache lifespan and the frequency of cache updates is now configureable in quicksql.go.
 5. Clients have the option to bypass the cache.
 
+
 **Version 1.2**
+
 1. Multiple connections at once.

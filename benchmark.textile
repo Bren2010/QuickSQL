@@ -1,12 +1,14 @@
 h1. QuickSQL Benchmarks
 
-** Version 1.1**
+
+**Version 1.1**
 # Without APC
 ## QuickSQL - 31523 read requests/second, 0.00026 seconds, per-run, as a whole.
 ## Memcached - 8454req/s, 0.00054 seconds...
 # With APC
 ## QuickSQL - 29959req/s, 0.00024 seconds...
 ## Memcached - 7754req/s, 0.00073 seconds...
+
 
 **Version 1.2**
 # Without APC
