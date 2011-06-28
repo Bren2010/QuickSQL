@@ -48,28 +48,31 @@ func sqlThread() {
 		handleErr(err, false)
 		
 		// Get result set
-		result, err := db.UseResult()
-		handleErr(err, true)
-		
 		var rowArray []mysql.Map
-		
-		// Get each row from the result and perform some processing
-		for {
-			row := result.FetchMap()
-
-			// Quit reading if there are no more rows.
-			if row == nil {
-				break
-			}
-			
-			// Add row to result slice.
-			rowArray = append(rowArray, row)
-		}
 		
 		// Get the error as a string or a return blank string.
 		errString := ""
 		if err != nil {
 			errString = err.String()
+		}
+
+		if err == nil {
+			result, err := db.UseResult()
+			handleErr(err, true)
+			
+			// Get each row from the result and perform some processing
+			for {
+				row := result.FetchMap()
+
+				// Quit reading if there are no more rows.
+				if row == nil {
+					break
+				}
+				
+				// Add row to result slice.
+				rowArray = append(rowArray, row)
+			}
+			
 		}
 		
 		// Create struct to response.
