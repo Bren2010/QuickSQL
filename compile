@@ -1,5 +1,0 @@
-#!/bin/bash
-6g *.go
-6l *.6
-rm -rf *.6
-mv 6.out quicksql
