@@ -18,9 +18,7 @@ Compiling
 1. Run the command:  `goinstall github.com/Philio/GoMySQL`  (See installation guide 
 [here](https://github.com/Philio/GoMySQL "GoMySQL") 
 for alternatives.)
-2. Run the following command in the base directory of the repository: `./compile` 
-(This is only if you're on a 64 bit system.  On 32 bit systems, you have to compile 
-manually using 8g.)
+2. Run the following command in the base directory of the repository: `gomake` and then `gomake install` 
 
 
 Changelog
